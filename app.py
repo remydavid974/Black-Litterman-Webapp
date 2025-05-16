@@ -717,7 +717,8 @@ with tab2:
         full_chart = alt.vconcat(chart_cr, chart_dd,spacing=0).resolve_scale(x='shared').configure_title(
         anchor='middle'  # Use 'start', 'middle', or 'end'
         )
-        st.altair_chart(full_chart, use_container_width=True)
+        with st.container():
+            st.altair_chart(full_chart, use_container_width=True)
 
 
 
