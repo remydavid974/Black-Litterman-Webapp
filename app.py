@@ -616,6 +616,17 @@ with tab2:
             clear="mouseout"
         )
 
+        tooltip=[
+            alt.Tooltip("Date:T", title="    "),
+            alt.Tooltip("Tooltip VW:N", title=" "),
+            alt.Tooltip("Tooltip NV:N", title="  "),
+            alt.Tooltip("Tooltip MP:N", title="   "),
+        ]
+        rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
+            x="Date:T",
+            opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
+            tooltip=tooltip
+        ).add_params(nearest)
     
         # --- Line chart for Cumulative Return ---
         line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
@@ -656,7 +667,7 @@ with tab2:
                 range=["#2ca02c", "#d62728", "#1f77b4"]
             )),
             opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-        )
+        ).transform_filter(nearest)
     
         # --- Points for Drawdown chart ---
         points_dd = alt.Chart(combined_data).mark_point().encode(
@@ -667,15 +678,7 @@ with tab2:
                 range=["#2ca02c", "#d62728", "#1f77b4"]
             )),
             opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-        )
-    
-        
-        tooltip=[
-            alt.Tooltip("Date:T", title="    "),
-            alt.Tooltip("Tooltip VW:N", title=" "),
-            alt.Tooltip("Tooltip NV:N", title="  "),
-            alt.Tooltip("Tooltip MP:N", title="   "),
-        ]
+        ).transform_filter(nearest)
         
         zero_line = alt.Chart(pivoted).mark_rule(color='black', strokeWidth=1).encode(
             y=alt.datum(0))
@@ -690,17 +693,7 @@ with tab2:
             y=alt.Y("Total Return:Q"),
             text=alt.Text("Total Return:Q", format=".1%"),
             color="Portfolio:N"
-        )
-    
-    
-        rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
-            x="Date:T",
-            opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
-            tooltip=tooltip
-        ).add_params(nearest)
-    
-    
-    
+        ).transform_filter(nearest)
     
     
         chart_cr = alt.layer(line_cr, points_cr, rules,text_labels).properties(
