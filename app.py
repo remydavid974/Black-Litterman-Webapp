@@ -531,7 +531,7 @@ with tab2:
         
     with col2:
                     
-        # --- Prepare data for plotting ---
+               # --- Prepare data for plotting ---
         plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
         plot_cr_BL.columns = ['Date', 'Cumulative Return']
         plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
@@ -577,6 +577,12 @@ with tab2:
         # Build pivoted table for tooltip
         pivoted = combined_data.pivot(index="Date", columns="Strategy", values=["Cumulative Return", "Drawdown"]).reset_index()
         pivoted.columns = ['Date'] + [f"{metric} {strategy}" for metric, strategy in pivoted.columns[1:]]
+        
+        # Debug check
+        st.write("Combined preview:", combined_data.head())
+        st.write("Pivoted columns:", pivoted.columns.tolist())
+        st.write("Latest returns preview:", latest_returns.head())
+        
         pivoted["Tooltip VW"] = pivoted.apply(
             lambda row: f"Views    | R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}", axis=1)
         pivoted["Tooltip NV"] = pivoted.apply(
@@ -584,10 +590,8 @@ with tab2:
         pivoted["Tooltip MP"] = pivoted.apply(
             lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
         
-        st.write("Pivoted preview:", pivoted.head())
-        st.write("Combined data preview:", combined_data.head())
-        st.write("Latest returns preview:", latest_returns.head())
-
+        # --- Altair Charts ---
+        import altair as alt
         
         nearest = alt.selection_single(fields=["Date"], nearest=True, on="mouseover", empty="none", clear="mouseout")
         selector = alt.Chart(pivoted).mark_rule(opacity=0).encode(x="Date:T").add_params(nearest)
@@ -598,20 +602,13 @@ with tab2:
             alt.Tooltip("Tooltip NV:N", title=""),
             alt.Tooltip("Tooltip MP:N", title="")
         ]
-        debug_chart = alt.Chart(pivoted).mark_line().encode(
-            x="Date:T",
-            y="Cumulative Return Portfolio with Views:Q"
-        )
         
-        st.altair_chart(debug_chart, use_container_width=True)
-
         rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
             x="Date:T",
             opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
             tooltip=tooltip
         ).transform_filter(nearest)
         
-        # Line and points for return
         color_scale = alt.Scale(
             domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
             range=['#2ca02c', '#d62728', '#1f77b4']
@@ -630,7 +627,6 @@ with tab2:
             opacity=alt.condition(nearest, alt.value(1), alt.value(0))
         ).transform_filter(nearest)
         
-        # Drawdown
         min_dd = combined_data_dd["Drawdown"].min()
         line_dd = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
             x=alt.X("Date:T", title="Date"),
@@ -661,8 +657,6 @@ with tab2:
         
         full_chart = alt.vconcat(chart_cr, chart_dd, spacing=0).resolve_scale(x='shared')
         st.altair_chart(full_chart, use_container_width=True)
-
-
 
 
 
