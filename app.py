@@ -531,7 +531,9 @@ with tab2:
         
     with col2:
         
-       # --- Prepare data for ploting ---
+        
+        
+        # --- Prepare data for ploting ---
         # BL
         plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
         plot_cr_BL.columns = ['Date', 'Cumulative Return'] 
@@ -720,6 +722,8 @@ with tab2:
         
 
         st.altair_chart(full_chart, use_container_width=True)
+
+
 
 
 
