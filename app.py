@@ -530,197 +530,197 @@ with tab2:
         
         
     with col2:
+        st.empty()
         
         
-        
-        # --- Prepare data for ploting ---
-        # BL
-        plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
-        plot_cr_BL.columns = ['Date', 'Cumulative Return'] 
-        plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
-        
-        plot_dd_BL = dd_BL[selected_col_BL].reset_index()
-        plot_dd_BL.columns = ['Date', 'Drawdown'] 
-        plot_dd_BL['Drawdown'] = plot_dd_BL['Drawdown'].astype(float)
-        
-        # NV
-        plot_cr_NV = cum_ret_NV[selected_col_NV].reset_index()
-        plot_cr_NV.columns = ['Date', 'Cumulative Return'] 
-        plot_cr_NV['Cumulative Return'] = plot_cr_NV['Cumulative Return'].astype(float)
-        
-        plot_dd_NV = dd_NV[selected_col_NV].reset_index()
-        plot_dd_NV.columns = ['Date', 'Drawdown'] 
-        plot_dd_NV['Drawdown'] = plot_dd_NV['Drawdown'].astype(float)
-        # VW
-        plot_cr_VW = cum_ret_VW[selected_col_VW].reset_index()
-        plot_cr_VW.columns = ['Date', 'Cumulative Return'] 
-        plot_cr_VW['Cumulative Return'] = plot_cr_VW['Cumulative Return'].astype(float)
-        
-        plot_dd_VW = dd_VW[selected_col_VW].reset_index()
-        plot_dd_VW.columns = ['Date', 'Drawdown'] 
-        plot_dd_VW['Drawdown'] = plot_dd_VW['Drawdown'].astype(float)
-        
-        latest_BL = plot_cr_BL.sort_values("Date").iloc[-1] 
-        latest_NV = plot_cr_NV.sort_values("Date").iloc[-1] 
-        latest_VW = plot_cr_VW.sort_values("Date").iloc[-1]
-        
-        latest_returns = pd.DataFrame({
-        "Date": [latest_BL["Date"], latest_NV["Date"], latest_VW["Date"]],
-        "Total Return": [latest_BL["Cumulative Return"] -1 , latest_NV["Cumulative Return"] -1, latest_VW["Cumulative Return"]-1],
-        "Portfolio": ["Portfolio with Views", "Portfolio without Views", "Market Portfolio"]
-        })
-        
+    # --- Prepare data for ploting ---
+    # BL
+    plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
+    plot_cr_BL.columns = ['Date', 'Cumulative Return'] 
+    plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
+    
+    plot_dd_BL = dd_BL[selected_col_BL].reset_index()
+    plot_dd_BL.columns = ['Date', 'Drawdown'] 
+    plot_dd_BL['Drawdown'] = plot_dd_BL['Drawdown'].astype(float)
+    
+    # NV
+    plot_cr_NV = cum_ret_NV[selected_col_NV].reset_index()
+    plot_cr_NV.columns = ['Date', 'Cumulative Return'] 
+    plot_cr_NV['Cumulative Return'] = plot_cr_NV['Cumulative Return'].astype(float)
+    
+    plot_dd_NV = dd_NV[selected_col_NV].reset_index()
+    plot_dd_NV.columns = ['Date', 'Drawdown'] 
+    plot_dd_NV['Drawdown'] = plot_dd_NV['Drawdown'].astype(float)
+    # VW
+    plot_cr_VW = cum_ret_VW[selected_col_VW].reset_index()
+    plot_cr_VW.columns = ['Date', 'Cumulative Return'] 
+    plot_cr_VW['Cumulative Return'] = plot_cr_VW['Cumulative Return'].astype(float)
+    
+    plot_dd_VW = dd_VW[selected_col_VW].reset_index()
+    plot_dd_VW.columns = ['Date', 'Drawdown'] 
+    plot_dd_VW['Drawdown'] = plot_dd_VW['Drawdown'].astype(float)
+    
+    latest_BL = plot_cr_BL.sort_values("Date").iloc[-1] 
+    latest_NV = plot_cr_NV.sort_values("Date").iloc[-1] 
+    latest_VW = plot_cr_VW.sort_values("Date").iloc[-1]
+    
+    latest_returns = pd.DataFrame({
+    "Date": [latest_BL["Date"], latest_NV["Date"], latest_VW["Date"]],
+    "Total Return": [latest_BL["Cumulative Return"] -1 , latest_NV["Cumulative Return"] -1, latest_VW["Cumulative Return"]-1],
+    "Portfolio": ["Portfolio with Views", "Portfolio without Views", "Market Portfolio"]
+    })
+    
 
-        # --- Name portfolios ---
-        plot_cr_BL['Strategy'] = 'Portfolio with Views'
-        plot_cr_NV['Strategy'] = 'Portfolio without Views'
-        plot_cr_VW['Strategy'] = 'Market Portfolio'
-        
-        plot_dd_BL['Strategy'] = 'Portfolio with Views'
-        plot_dd_NV['Strategy'] = 'Portfolio without Views'
-        plot_dd_VW['Strategy'] = 'Market Portfolio'
+    # --- Name portfolios ---
+    plot_cr_BL['Strategy'] = 'Portfolio with Views'
+    plot_cr_NV['Strategy'] = 'Portfolio without Views'
+    plot_cr_VW['Strategy'] = 'Market Portfolio'
+    
+    plot_dd_BL['Strategy'] = 'Portfolio with Views'
+    plot_dd_NV['Strategy'] = 'Portfolio without Views'
+    plot_dd_VW['Strategy'] = 'Market Portfolio'
 
-        # Combine into one long-format DataFrame
-        combined_data_cr = pd.concat([plot_cr_BL, plot_cr_NV,plot_cr_VW], ignore_index=True)
-        combined_data_cr["Cumulative Return"] = combined_data_cr["Cumulative Return"] - 1
-        combined_data_dd = pd.concat([plot_dd_BL, plot_dd_NV,plot_dd_VW], ignore_index=True)
-        
-        combined_data = pd.merge(
-        combined_data_cr,
-        combined_data_dd,
-        on=["Date", "Strategy"],
-        how="inner"
-        )
+    # Combine into one long-format DataFrame
+    combined_data_cr = pd.concat([plot_cr_BL, plot_cr_NV,plot_cr_VW], ignore_index=True)
+    combined_data_cr["Cumulative Return"] = combined_data_cr["Cumulative Return"] - 1
+    combined_data_dd = pd.concat([plot_dd_BL, plot_dd_NV,plot_dd_VW], ignore_index=True)
+    
+    combined_data = pd.merge(
+    combined_data_cr,
+    combined_data_dd,
+    on=["Date", "Strategy"],
+    how="inner"
+    )
 
-            # Pivot data to wide format
-        pivoted = combined_data.pivot(index="Date", columns="Strategy", values=["Cumulative Return", "Drawdown"]).reset_index()
-        # Flatten MultiIndex columns
-        pivoted.columns = ['Date'] + [f"{metric} {strategy}" for metric, strategy in pivoted.columns[1:]]
-        pivoted["Tooltip VW"] = pivoted.apply(
-            lambda row: f"Views \u2003\u2009\u2009\u2009\u200A\u200A\u200A| R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}",
-            axis=1
-        )
-        pivoted["Tooltip NV"] = pivoted.apply(
-            lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}",
-            axis=1
-        )
-        pivoted["Tooltip MP"] = pivoted.apply(
-            lambda row: f"Market \u00A0\u00A0\u00A0\u2009 | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}",
-            axis=1
-        )
+        # Pivot data to wide format
+    pivoted = combined_data.pivot(index="Date", columns="Strategy", values=["Cumulative Return", "Drawdown"]).reset_index()
+    # Flatten MultiIndex columns
+    pivoted.columns = ['Date'] + [f"{metric} {strategy}" for metric, strategy in pivoted.columns[1:]]
+    pivoted["Tooltip VW"] = pivoted.apply(
+        lambda row: f"Views \u2003\u2009\u2009\u2009\u200A\u200A\u200A| R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}",
+        axis=1
+    )
+    pivoted["Tooltip NV"] = pivoted.apply(
+        lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}",
+        axis=1
+    )
+    pivoted["Tooltip MP"] = pivoted.apply(
+        lambda row: f"Market \u00A0\u00A0\u00A0\u2009 | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}",
+        axis=1
+    )
 
-        # --- Create the nearest-point selection ---
-        nearest = alt.selection_point(
-            nearest=True,
-            on="pointerover",
-            fields=["Date"],
-            empty=False
-        )
+    # --- Create the nearest-point selection ---
+    nearest = alt.selection_point(
+        nearest=True,
+        on="pointerover",
+        fields=["Date"],
+        empty=False
+    )
 
-        # --- Line chart for Cumulative Return ---
-        line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
-            x=alt.X("Date:T", axis=None),
-            y=alt.Y("Cumulative Return:Q", title="Total Return", axis=alt.Axis(format=".0%")),
-            color=alt.Color(
-                "Strategy:N",
-                title="",
-                scale=alt.Scale(
-                    domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
-                    range=['#2ca02c', '#d62728', '#1f77b4']
-                )
+    # --- Line chart for Cumulative Return ---
+    line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
+        x=alt.X("Date:T", axis=None),
+        y=alt.Y("Cumulative Return:Q", title="Total Return", axis=alt.Axis(format=".0%")),
+        color=alt.Color(
+            "Strategy:N",
+            title="",
+            scale=alt.Scale(
+                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                range=['#2ca02c', '#d62728', '#1f77b4']
             )
         )
-        min_dd = combined_data_dd["Drawdown"].min()
+    )
+    min_dd = combined_data_dd["Drawdown"].min()
 
-        # --- Line chart for Drawdown ---
-        line_dd = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
-            x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Drawdown:Q", title="Drawdown", axis=alt.Axis(format=".0%"),
-                    scale=alt.Scale(domain=[min_dd, 0.01],nice=False)),
-            color=alt.Color(
-                "Strategy:N", legend=alt.Legend(orient='top-left'),
-                title="",
-                scale=alt.Scale(
-                    domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
-                    range=['#2ca02c', '#d62728', '#1f77b4']
-                )
+    # --- Line chart for Drawdown ---
+    line_dd = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
+        x=alt.X("Date:T", title="Date"),
+        y=alt.Y("Drawdown:Q", title="Drawdown", axis=alt.Axis(format=".0%"),
+                scale=alt.Scale(domain=[min_dd, 0.01],nice=False)),
+        color=alt.Color(
+            "Strategy:N", legend=alt.Legend(orient='top-left'),
+            title="",
+            scale=alt.Scale(
+                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                range=['#2ca02c', '#d62728', '#1f77b4']
             )
         )
+    )
 
-        # --- Points for Return chart ---
-        points_cr = alt.Chart(combined_data).mark_point().encode(
-            x="Date:T",
-            y="Cumulative Return:Q",
-            color=alt.Color("Strategy:N", scale=alt.Scale(
-                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
-                range=["#2ca02c", "#d62728", "#1f77b4"]
-            )),
-            opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-        )
+    # --- Points for Return chart ---
+    points_cr = alt.Chart(combined_data).mark_point().encode(
+        x="Date:T",
+        y="Cumulative Return:Q",
+        color=alt.Color("Strategy:N", scale=alt.Scale(
+            domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+            range=["#2ca02c", "#d62728", "#1f77b4"]
+        )),
+        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+    )
 
-        # --- Points for Drawdown chart ---
-        points_dd = alt.Chart(combined_data).mark_point().encode(
-            x="Date:T",
-            y="Drawdown:Q",
-            color=alt.Color("Strategy:N", scale=alt.Scale(
-                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
-                range=["#2ca02c", "#d62728", "#1f77b4"]
-            )),
-            opacity=alt.condition(nearest, alt.value(1), alt.value(0))
-        )
+    # --- Points for Drawdown chart ---
+    points_dd = alt.Chart(combined_data).mark_point().encode(
+        x="Date:T",
+        y="Drawdown:Q",
+        color=alt.Color("Strategy:N", scale=alt.Scale(
+            domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+            range=["#2ca02c", "#d62728", "#1f77b4"]
+        )),
+        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+    )
 
-        
-        tooltip=[
-            alt.Tooltip("Date:T", title="    "),
-            alt.Tooltip("Tooltip VW:N", title=" "),
-            alt.Tooltip("Tooltip NV:N", title="  "),
-            alt.Tooltip("Tooltip MP:N", title="   "),
-        ]
-        
-        zero_line = alt.Chart(pivoted).mark_rule(color='black', strokeWidth=1).encode(
-            y=alt.datum(0))
-        text_labels = alt.Chart(latest_returns).mark_text(
-            align='left',
-            dx=5,
-            dy=0,
-            fontSize=12,
-            fontWeight='bold'
-        ).encode(
-            x="Date:T",
-            y=alt.Y("Total Return:Q"),
-            text=alt.Text("Total Return:Q", format=".1%"),
-            color="Portfolio:N"
-        )
-
-
-        rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
-            x="Date:T",
-            opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
-            tooltip=tooltip
-        ).add_params(nearest)
+    
+    tooltip=[
+        alt.Tooltip("Date:T", title="    "),
+        alt.Tooltip("Tooltip VW:N", title=" "),
+        alt.Tooltip("Tooltip NV:N", title="  "),
+        alt.Tooltip("Tooltip MP:N", title="   "),
+    ]
+    
+    zero_line = alt.Chart(pivoted).mark_rule(color='black', strokeWidth=1).encode(
+        y=alt.datum(0))
+    text_labels = alt.Chart(latest_returns).mark_text(
+        align='left',
+        dx=5,
+        dy=0,
+        fontSize=12,
+        fontWeight='bold'
+    ).encode(
+        x="Date:T",
+        y=alt.Y("Total Return:Q"),
+        text=alt.Text("Total Return:Q", format=".1%"),
+        color="Portfolio:N"
+    )
 
 
+    rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
+        x="Date:T",
+        opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
+        tooltip=tooltip
+    ).add_params(nearest)
 
 
 
-        chart_cr = alt.layer(line_cr, points_cr, rules,text_labels).properties(
-            width=800,
-            height=250,
-        )
 
-        chart_dd = alt.layer(line_dd, points_dd, rules,zero_line).properties(
-            width=800,
-            height=180,
-        )
 
-        # --- Final synchronized display ---
-        full_chart = alt.vconcat(chart_cr, chart_dd,spacing=0).resolve_scale(x='shared').configure_title(
-        anchor='middle'  # Use 'start', 'middle', or 'end'
-        )
+    chart_cr = alt.layer(line_cr, points_cr, rules,text_labels).properties(
+        width=800,
+        height=250,
+    )
 
-        st.write(f"Selected Omega: {omega}")
-        with st.container():
-            st.altair_chart(full_chart, use_container_width=True)
+    chart_dd = alt.layer(line_dd, points_dd, rules,zero_line).properties(
+        width=800,
+        height=180,
+    )
+
+    # --- Final synchronized display ---
+    full_chart = alt.vconcat(chart_cr, chart_dd,spacing=0).resolve_scale(x='shared').configure_title(
+    anchor='middle'  # Use 'start', 'middle', or 'end'
+    )
+
+    st.write(f"Selected Omega: {omega}")
+    with st.container():
+        st.altair_chart(full_chart, use_container_width=True)
 
 
 
