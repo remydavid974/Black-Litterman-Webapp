@@ -482,50 +482,27 @@ with tab2:
 
 
 
-        def render_metric_table(df):
-            header = "".join([f"<th>{col}</th>" for col in df.columns])
-            rows = ""
-            for _, row in df.iterrows():
-                cells = "".join([f"<td>{val}</td>" for val in row])
-                rows += f"<tr>{cells}</tr>"
-
-            html = f"""
-            <style>
-            .metric-table {{
-                font-size: 13px;
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-                font-family: 'Segoe UI', sans-serif;
-            }}
-            .metric-table th {{
-                background-color: #f0f0f0;
-                color: #333;
-                padding: 6px 10px;
-                text-align: center;
-                border-bottom: 1px solid #ccc;
-            }}
-            .metric-table td {{
-                padding: 6px 10px;
-                text-align: center;
-                border-bottom: 1px solid #eee;
-            }}
-            .metric-table tr:hover {{
-                background-color: #f9f9f9;
-            }}
-            </style>
-
-            <table class="metric-table">
-                <thead><tr>{header}</tr></thead>
-                <tbody>{rows}</tbody>
-            </table>
-            """
-
-            st.markdown(html, unsafe_allow_html=True)
-
-
-
-        render_metric_table(df)
+        def render_plotly_table(df):
+            fig = go.Figure(data=[go.Table(
+                header=dict(
+                    values=list(df.columns),
+                    fill_color='#f0f2f6',
+                    align='center',
+                    font=dict(color='black', size=13)
+                ),
+                cells=dict(
+                    values=[df[col] for col in df.columns],
+                    fill_color='white',
+                    align='center',
+                    font=dict(color='black', size=12),
+                    height=28
+                )
+            )])
+            fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
+            st.plotly_chart(fig, use_container_width=True)
+            
+        st.markdown("##  \n")  # 1 empty line
+        render_plotly_table(df)
         
         
         
