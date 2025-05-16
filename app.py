@@ -530,6 +530,7 @@ with tab2:
         
         
     with col2:# --- Prepare data for plotting ---
+               # --- Prepare data for plotting ---
         plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
         plot_cr_BL.columns = ['Date', 'Cumulative Return']
         plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
@@ -572,43 +573,35 @@ with tab2:
         
         combined_data = pd.merge(combined_data_cr, combined_data_dd, on=["Date", "Strategy"], how="inner")
         
-        # Build pivoted table for tooltip
+        # Pivot data to wide format
         pivoted = combined_data.pivot(index="Date", columns="Strategy", values=["Cumulative Return", "Drawdown"]).reset_index()
         pivoted.columns = ['Date'] + [f"{metric} {strategy}" for metric, strategy in pivoted.columns[1:]]
         
-        # Debug check
-        st.write("Combined preview:", combined_data.head())
-        st.write("Pivoted columns:", pivoted.columns.tolist())
-        st.write("Latest returns preview:", latest_returns.head())
+        pivoted["Tooltip VW"] = pivoted.apply(
+            lambda row: f"Views    | R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}", axis=1)
+        pivoted["Tooltip NV"] = pivoted.apply(
+            lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}", axis=1)
+        pivoted["Tooltip MP"] = pivoted.apply(
+            lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
         
-        # Safe tooltip creation only if required columns exist
-        required_cols = [
-            'Cumulative Return Portfolio with Views', 'Drawdown Portfolio with Views',
-            'Cumulative Return Portfolio without Views', 'Drawdown Portfolio without Views',
-            'Cumulative Return Market Portfolio', 'Drawdown Market Portfolio'
-        ]
+        # --- Create the nearest-point selection ---
+        nearest = alt.selection_single(
+            fields=["Date"],
+            nearest=True,
+            on="mouseover",
+            empty="none",
+            clear="mouseout"
+        )
         
-        if all(col in pivoted.columns for col in required_cols):
-            pivoted["Tooltip VW"] = pivoted.apply(
-                lambda row: f"Views    | R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}", axis=1)
-            pivoted["Tooltip NV"] = pivoted.apply(
-                lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}", axis=1)
-            pivoted["Tooltip MP"] = pivoted.apply(
-                lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
-        else:
-            st.warning("Missing expected columns in pivoted DataFrame. Tooltip not created.")
-        
-        # --- Altair Charts ---
-        import altair as alt
-        
-        nearest = alt.selection_single(fields=["Date"], nearest=True, on="mouseover", empty="none", clear="mouseout")
-        selector = alt.Chart(pivoted).mark_rule(opacity=0).encode(x="Date:T").add_params(nearest)
+        selector = alt.Chart(pivoted).mark_rule(opacity=0).encode(
+            x="Date:T"
+        ).add_params(nearest)
         
         tooltip = [
-            alt.Tooltip("Date:T", title=""),
-            alt.Tooltip("Tooltip VW:N", title=""),
-            alt.Tooltip("Tooltip NV:N", title=""),
-            alt.Tooltip("Tooltip MP:N", title="")
+            alt.Tooltip("Date:T", title="    "),
+            alt.Tooltip("Tooltip VW:N", title=" "),
+            alt.Tooltip("Tooltip NV:N", title="  "),
+            alt.Tooltip("Tooltip MP:N", title="   "),
         ]
         
         rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
@@ -617,42 +610,68 @@ with tab2:
             tooltip=tooltip
         ).transform_filter(nearest)
         
-        color_scale = alt.Scale(
-            domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
-            range=['#2ca02c', '#d62728', '#1f77b4']
-        )
-        
+        # --- Line chart for Cumulative Return ---
         line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
             x=alt.X("Date:T", axis=None),
             y=alt.Y("Cumulative Return:Q", title="Total Return", axis=alt.Axis(format=".0%")),
-            color=alt.Color("Strategy:N", scale=color_scale, title="")
+            color=alt.Color(
+                "Strategy:N",
+                title="",
+                scale=alt.Scale(
+                    domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                    range=['#2ca02c', '#d62728', '#1f77b4']
+                )
+            )
         )
         
+        min_dd = combined_data_dd["Drawdown"].min()
+        
+        # --- Line chart for Drawdown ---
+        line_dd = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
+            x=alt.X("Date:T", title="Date"),
+            y=alt.Y("Drawdown:Q", title="Drawdown", axis=alt.Axis(format=".0%"),
+                    scale=alt.Scale(domain=[min_dd, 0.01],nice=False)),
+            color=alt.Color(
+                "Strategy:N", legend=alt.Legend(orient='top-left'),
+                title="",
+                scale=alt.Scale(
+                    domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                    range=['#2ca02c', '#d62728', '#1f77b4']
+                )
+            )
+        )
+        
+        # --- Points for Return chart ---
         points_cr = alt.Chart(combined_data).mark_point().encode(
             x="Date:T",
             y="Cumulative Return:Q",
-            color=alt.Color("Strategy:N", scale=color_scale),
+            color=alt.Color("Strategy:N", scale=alt.Scale(
+                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                range=["#2ca02c", "#d62728", "#1f77b4"]
+            )),
             opacity=alt.condition(nearest, alt.value(1), alt.value(0))
         ).transform_filter(nearest)
         
-        min_dd = combined_data_dd["Drawdown"].min()
-        line_dd = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
-            x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Drawdown:Q", title="Drawdown", axis=alt.Axis(format=".0%"), scale=alt.Scale(domain=[min_dd, 0.01], nice=False)),
-            color=alt.Color("Strategy:N", scale=color_scale, title="")
-        )
-        
+        # --- Points for Drawdown chart ---
         points_dd = alt.Chart(combined_data).mark_point().encode(
             x="Date:T",
             y="Drawdown:Q",
-            color=alt.Color("Strategy:N", scale=color_scale),
+            color=alt.Color("Strategy:N", scale=alt.Scale(
+                domain=["Portfolio with Views", "Portfolio without Views", "Market Portfolio"],
+                range=["#2ca02c", "#d62728", "#1f77b4"]
+            )),
             opacity=alt.condition(nearest, alt.value(1), alt.value(0))
         ).transform_filter(nearest)
         
-        zero_line = alt.Chart(pivoted).mark_rule(color='black', strokeWidth=1).encode(y=alt.datum(0))
+        zero_line = alt.Chart(pivoted).mark_rule(color='black', strokeWidth=1).encode(
+            y=alt.datum(0))
         
         text_labels = alt.Chart(latest_returns).mark_text(
-            align='left', dx=5, dy=0, fontSize=12, fontWeight='bold'
+            align='left',
+            dx=5,
+            dy=0,
+            fontSize=12,
+            fontWeight='bold'
         ).encode(
             x="Date:T",
             y=alt.Y("Total Return:Q"),
@@ -660,11 +679,23 @@ with tab2:
             color="Portfolio:N"
         )
         
-        chart_cr = alt.layer(selector, line_cr, points_cr, rules, text_labels).properties(width=800, height=250)
-        chart_dd = alt.layer(line_dd, points_dd, rules, zero_line).properties(width=800, height=180)
+        chart_cr = alt.layer(
+            selector,
+            line_cr, points_cr, rules, text_labels).properties(
+            width=800,
+            height=250,
+        )
         
-        full_chart = alt.vconcat(chart_cr, chart_dd, spacing=0).resolve_scale(x='shared')
-        st.altair_chart(full_chart, use_container_width=True)
-
-
+        chart_dd = alt.layer(line_dd, points_dd, rules, zero_line).properties(
+            width=800,
+            height=180,
+        )
+        
+        # --- Final synchronized display ---
+        full_chart = alt.vconcat(chart_cr, chart_dd, spacing=0).resolve_scale(x='shared').configure_title(
+            anchor='middle'  # Use 'start', 'middle', or 'end'
+        )
+        
+        with st.container():
+            st.altair_chart(full_chart, use_container_width=True)
 
