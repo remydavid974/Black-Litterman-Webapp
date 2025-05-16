@@ -529,8 +529,7 @@ with tab2:
         
         
         
-    with col2:
-                # --- Prepare data for plotting ---
+    with col2:# --- Prepare data for plotting ---
         plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
         plot_cr_BL.columns = ['Date', 'Cumulative Return']
         plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
@@ -582,12 +581,22 @@ with tab2:
         st.write("Pivoted columns:", pivoted.columns.tolist())
         st.write("Latest returns preview:", latest_returns.head())
         
-        pivoted["Tooltip VW"] = pivoted.apply(
-            lambda row: f"Views    | R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}", axis=1)
-        pivoted["Tooltip NV"] = pivoted.apply(
-            lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}", axis=1)
-        pivoted["Tooltip MP"] = pivoted.apply(
-            lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
+        # Safe tooltip creation only if required columns exist
+        required_cols = [
+            'Cumulative Return Portfolio with Views', 'Drawdown Portfolio with Views',
+            'Cumulative Return Portfolio without Views', 'Drawdown Portfolio without Views',
+            'Cumulative Return Market Portfolio', 'Drawdown Market Portfolio'
+        ]
+        
+        if all(col in pivoted.columns for col in required_cols):
+            pivoted["Tooltip VW"] = pivoted.apply(
+                lambda row: f"Views    | R: {row['Cumulative Return Portfolio with Views']:.1%} | DD: {row['Drawdown Portfolio with Views']:.1%}", axis=1)
+            pivoted["Tooltip NV"] = pivoted.apply(
+                lambda row: f"No Views | R: {row['Cumulative Return Portfolio without Views']:.1%} | DD: {row['Drawdown Portfolio without Views']:.1%}", axis=1)
+            pivoted["Tooltip MP"] = pivoted.apply(
+                lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
+        else:
+            st.warning("Missing expected columns in pivoted DataFrame. Tooltip not created.")
         
         # --- Altair Charts ---
         import altair as alt
