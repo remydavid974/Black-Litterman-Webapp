@@ -719,8 +719,7 @@ with tab2:
         )
 
         st.write(f"Selected Omega: {omega}")
-        with st.container():
-            st.altair_chart(full_chart, use_container_width=True)
+        st.altair_chart(full_chart, use_container_width=True)
 
 
 
