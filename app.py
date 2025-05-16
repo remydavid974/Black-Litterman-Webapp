@@ -530,8 +530,7 @@ with tab2:
         
         
     with col2:
-                    
-               # --- Prepare data for plotting ---
+                # --- Prepare data for plotting ---
         plot_cr_BL = cum_ret_BL[selected_col_BL].reset_index()
         plot_cr_BL.columns = ['Date', 'Cumulative Return']
         plot_cr_BL['Cumulative Return'] = plot_cr_BL['Cumulative Return'].astype(float)
