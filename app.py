@@ -584,8 +584,10 @@ with tab2:
         pivoted["Tooltip MP"] = pivoted.apply(
             lambda row: f"Market   | R: {row['Cumulative Return Market Portfolio']:.1%} | DD: {row['Drawdown Market Portfolio']:.1%}", axis=1)
         
-        # --- Altair Charts ---
-        import altair as alt
+        st.write("Pivoted preview:", pivoted.head())
+        st.write("Combined data preview:", combined_data.head())
+        st.write("Latest returns preview:", latest_returns.head())
+
         
         nearest = alt.selection_single(fields=["Date"], nearest=True, on="mouseover", empty="none", clear="mouseout")
         selector = alt.Chart(pivoted).mark_rule(opacity=0).encode(x="Date:T").add_params(nearest)
@@ -596,7 +598,13 @@ with tab2:
             alt.Tooltip("Tooltip NV:N", title=""),
             alt.Tooltip("Tooltip MP:N", title="")
         ]
+        debug_chart = alt.Chart(pivoted).mark_line().encode(
+            x="Date:T",
+            y="Cumulative Return Portfolio with Views:Q"
+        )
         
+        st.altair_chart(debug_chart, use_container_width=True)
+
         rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
             x="Date:T",
             opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
