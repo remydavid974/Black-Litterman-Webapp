@@ -716,7 +716,6 @@ with tab2:
         anchor='middle'  # Use 'start', 'middle', or 'end'
         )
     
-        st.write(f"Selected Omega: {omega}")
         with st.container():
             st.altair_chart(full_chart, use_container_width=True)
 
