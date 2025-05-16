@@ -608,12 +608,14 @@ with tab2:
         )
     
         # --- Create the nearest-point selection ---
-        nearest = alt.selection_point(
-            nearest=True,
-            on="pointerover",
+        nearest = alt.selection_single(
             fields=["Date"],
-            empty=False
+            nearest=True,
+            on="mouseover",
+            empty="none",
+            clear="mouseout"
         )
+
     
         # --- Line chart for Cumulative Return ---
         line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
