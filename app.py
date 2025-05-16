@@ -622,12 +622,17 @@ with tab2:
             alt.Tooltip("Tooltip NV:N", title="  "),
             alt.Tooltip("Tooltip MP:N", title="   "),
         ]
+        
         rules = alt.Chart(pivoted).mark_rule(color="gray").encode(
             x="Date:T",
             opacity=alt.condition(nearest, alt.value(0.3), alt.value(0)),
             tooltip=tooltip
+        ).transform_filter(nearest)
+        
+        selector = alt.Chart(pivoted).mark_rule(opacity=0).encode(
+            x="Date:T"
         ).add_params(nearest)
-    
+        
         # --- Line chart for Cumulative Return ---
         line_cr = alt.Chart(combined_data).mark_line(strokeWidth=1.5).encode(
             x=alt.X("Date:T", axis=None),
@@ -693,10 +698,12 @@ with tab2:
             y=alt.Y("Total Return:Q"),
             text=alt.Text("Total Return:Q", format=".1%"),
             color="Portfolio:N"
-        ).transform_filter(nearest)
+        )
     
     
-        chart_cr = alt.layer(line_cr, points_cr, rules,text_labels).properties(
+        chart_cr = alt.layer(
+            selector,
+            line_cr, points_cr, rules,text_labels).properties(
             width=800,
             height=250,
         )
