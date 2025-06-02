@@ -14,6 +14,8 @@ This project implements a sentiment-driven investment strategy using the Black-L
 - **Rolling regressions**: Used to estimate sensitivity of returns to sentiment changes (with t-stat scaling)
 - **Realistic features**: Turnover penalties, volatility targeting, no short-selling or leverage
 - **Full backtesting**: Evaluates performance under varying regimes and parameter settings
+- **Full methodology and model details are explained interactively in the app itself.**  
+Includes all formulas, assumptions, signal construction logic, and constraint design.
 
 ---
 
