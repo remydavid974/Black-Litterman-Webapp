@@ -739,7 +739,3 @@ with tab2:
         
 
         st.altair_chart(full_chart, use_container_width=True)
-
-
-
-
