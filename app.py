@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import altair as alt
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="Black-Litterman Strategy", layout="wide")
 
