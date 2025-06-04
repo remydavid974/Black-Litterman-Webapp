@@ -23,15 +23,15 @@ def get_key_from_value(d, value):
 
 
 # --- Load data ---
-cum_ret_BL = load_data("cum_ret_df_BL.csv")
-cum_ret_NV = load_data("cum_ret_df_NV.csv")
-cum_ret_VW = load_data("cum_ret_df_VW.csv")
-dd_BL = load_data("drawdown_df_BL.csv")
-dd_NV = load_data("drawdown_df_NV.csv")
-dd_VW = load_data("drawdown_df_VW.csv")
-metric_BL = load_data("metric_df_BL.csv")
-metric_NV = load_data("metric_df_NV.csv")
-metric_VW = load_data("metric_df_VW.csv")
+cum_ret_BL = load_data("results/cum_ret_df_BL.csv")
+cum_ret_NV = load_data("results/cum_ret_df_NV.csv")
+cum_ret_VW = load_data("results/cum_ret_df_VW.csv")
+dd_BL = load_data("results/drawdown_df_BL.csv")
+dd_NV = load_data("results/drawdown_df_NV.csv")
+dd_VW = load_data("results/drawdown_df_VW.csv")
+metric_BL = load_data("results/metric_df_BL.csv")
+metric_NV = load_data("results/metric_df_NV.csv")
+metric_VW = load_data("results/metric_df_VW.csv")
 
 # --- Extract parameter BL ---
 params_BL = cum_ret_BL.columns.str.extract(r'win=(\d+)_risk=(\d+)_tc=([\d.]+)_tv=([\d.]+|inf)_tp=([\d.]+)')
